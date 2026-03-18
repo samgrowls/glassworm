@@ -1,5 +1,5 @@
 [workspace]
-members = ["glassworm-core", "glassworm-cli"]
+members = ["glassware-core", "glassware-cli"]
 resolver = "2"
 
 [workspace.package]

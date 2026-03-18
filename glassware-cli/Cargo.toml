@@ -1,0 +1,24 @@
+[package]
+name = "glassware-cli"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Detect invisible Unicode attacks in source code"
+keywords = ["unicode", "security", "trojan-source", "glassware", "scanner"]
+categories = ["security", "command-line-utilities"]
+
+[[bin]]
+name = "glassware"
+path = "src/main.rs"
+
+[dependencies]
+glassware-core = { path = "../glassware-core", features = ["full"] }
+clap = { version = "4", features = ["derive"] }
+colored = "2"
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+walkdir = "2.4"
+
+[features]
+default = ["llm"]
+llm = ["glassware-core/llm"]
