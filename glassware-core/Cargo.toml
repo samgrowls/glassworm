@@ -53,3 +53,23 @@ llm = ["dep:reqwest", "dep:dotenvy", "serde", "serde_json"]  # LLM analysis laye
 
 [dev-dependencies]
 tempfile = "3.9"
+
+[[test]]
+name = "integration_campaign_fixtures"
+path = "tests/integration_campaign_fixtures.rs"
+required-features = ["full"]
+
+[[test]]
+name = "integration_false_positives"
+path = "tests/integration_false_positives.rs"
+required-features = ["full"]
+
+[[test]]
+name = "integration_edge_cases"
+path = "tests/integration_edge_cases.rs"
+required-features = ["full"]
+
+[[test]]
+name = "integration_scan_directory"
+path = "tests/integration_scan_directory.rs"
+required-features = ["full"]

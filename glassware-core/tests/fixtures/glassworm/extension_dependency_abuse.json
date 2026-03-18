@@ -1,0 +1,27 @@
+{
+  "name": "malicious-extension-pack",
+  "displayName": "Developer Tools Extension Pack",
+  "description": "A curated collection of developer tools",
+  "version": "1.0.0",
+  "publisher": "malicious-publisher",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "extensionPack": [
+    "malicious-publisher.helper-tools",
+    "malicious-publisher.code-utils",
+    "malicious-publisher.productivity-pack"
+  ],
+  "extensionDependencies": [
+    "malicious-publisher.helper-tools"
+  ],
+  "icon": "images/icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/malicious-publisher/malicious-extension-pack"
+  }
+}

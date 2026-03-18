@@ -327,4 +327,70 @@ mod tests {
         let findings = detector.scan(Path::new("test.js"), content, &UnicodeConfig::default());
         assert!(!findings.is_empty());
     }
+
+    #[test]
+    fn test_detect_eval_atob_pattern() {
+        let detector = EncryptedPayloadDetector::new();
+        let content = r#"
+            const data = "VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHBheWxvYWQgdGhhdCBpcyBsb25nIGVub3VnaCB0byB0cmlnZ2VyIGRldGVjdGlvbi4=";
+            eval(atob(data));
+        "#;
+
+        let findings = detector.scan(Path::new("test.js"), content, &UnicodeConfig::default());
+        assert!(!findings.is_empty());
+        assert_eq!(findings[0].category, DetectionCategory::EncryptedPayload);
+    }
+
+    #[test]
+    fn test_detect_buffer_from_tostring_eval() {
+        let detector = EncryptedPayloadDetector::new();
+        let content = r#"
+            const payload = "VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHBheWxvYWQgdGhhdCBpcyBsb25nIGVub3VnaCB0byB0cmlnZ2VyIGRldGVjdGlvbi4=";
+            eval(Buffer.from(payload, 'base64').toString('utf-8'));
+        "#;
+
+        let findings = detector.scan(Path::new("test.js"), content, &UnicodeConfig::default());
+        assert!(!findings.is_empty());
+    }
+
+    #[test]
+    fn test_no_detect_low_entropy_blob_with_exec() {
+        let detector = EncryptedPayloadDetector::new();
+        let content = r#"
+            const repeated = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+            eval(repeated);
+        "#;
+
+        let findings = detector.scan(Path::new("test.js"), content, &UnicodeConfig::default());
+        // Should NOT detect - low entropy blob
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn test_no_detect_short_blob_with_exec() {
+        let detector = EncryptedPayloadDetector::new();
+        let content = r#"
+            const short = "SGVsbG8gV29ybGQh";
+            eval(atob(short));
+        "#;
+
+        let findings = detector.scan(Path::new("test.js"), content, &UnicodeConfig::default());
+        // Should NOT detect - blob too short (< 64 chars)
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn test_entropy_calculation_uniform() {
+        let detector = EncryptedPayloadDetector::new();
+        let entropy = detector.calculate_entropy(&[0x41, 0x41, 0x41, 0x41]);
+        assert!((entropy - 0.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_entropy_calculation_high() {
+        let detector = EncryptedPayloadDetector::new();
+        let data: Vec<u8> = (0..=255).collect();
+        let entropy = detector.calculate_entropy(&data);
+        assert!(entropy > 7.9);
+    }
 }
